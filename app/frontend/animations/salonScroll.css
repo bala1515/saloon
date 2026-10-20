@@ -1,0 +1,146 @@
+.reading-progress { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: #c4a878; transform: scaleX(0); transform-origin: left center; z-index: 40; pointer-events: none; }
+.studio-stage, .studio-story { display: contents; }
+.craft-depth-word, .craft-detail, .portfolio-depth-word, .studio-depth-title, .studio-aperture, .studio-scrim { display: none; }
+
+/* Hero and Craft Section overlay motion */
+[data-scroll-motion='active'] .cinematic-hero { height: 100svh; max-height: none; }
+[data-scroll-motion='active'] .cinematic-stage { height: 100svh; max-height: none; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .cinematic-hero { height: 100svh; }
+[data-scroll-motion='active'] .craft-section { position: relative; isolation: isolate; overflow-x: clip; overflow-y: visible; height: 100svh; min-height: 680px; z-index: 10; }
+
+/* A native sticky studio lens, with content moving naturally in front of it. */
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-section { display: block; position: relative; padding: 0; isolation: isolate; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-stage { display: block; position: sticky; top: 0; height: 100svh; min-height: 680px; overflow: hidden; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-image { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
+[data-scroll-motion='active'] .studio-image { overflow: hidden; }
+[data-scroll-motion='active'] .studio-image img { position: absolute; inset: -18% 0 auto; width: 100%; height: 136%; object-position: 40% center; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-image figcaption { left: 7%; right: auto; bottom: 5%; font-size: 8px; z-index: 2; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-aperture { display: block; position: absolute; top: 0; bottom: 0; width: 18%; background: var(--ivory); z-index: 3; pointer-events: none; }
+.studio-aperture-left { left: 0; transform-origin: left; }
+.studio-aperture-right { right: 0; transform-origin: right; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-scrim { display: block; position: absolute; inset: 0; background: linear-gradient(90deg,#0c0d0c26 10%,#0c0d0c99 44%,#0c0d0ce8 100%); pointer-events: none; z-index: 1; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-depth-title { display: block; position: absolute; top: 27%; left: 7%; z-index: 2; font: 400 clamp(100px,13vw,210px)/.85 var(--serif); letter-spacing: -.05em; color: var(--ivory); text-shadow: 0 4px 30px #0004; pointer-events: none; }
+.studio-depth-title > span, .studio-depth-title > em { display: block; font-weight: 400; }
+.studio-depth-title > em { margin-left: 20%; color: #e0c69d; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-story { display: flex; flex-direction: column; justify-content: center; position: relative; min-height: 100svh; margin-top: -20svh; padding: 90px 7% 45px; z-index: 4; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-copy { width: 43%; margin-left: auto; padding: 0; align-self: auto; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-copy h2 { font-size: clamp(52px,5vw,76px); }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-copy p:not(.section-label) { max-width: 440px; color: #d5d0c6; text-shadow: 0 1px 14px #0008; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-footnote { margin-top: 9svh; padding-top: 25px; border-color: #efe9df55; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-footnote > span { color: #d2c2a5; }
+
+/* Portraits at different depths, a continuous vertical journey rather than another pin. */
+[data-scroll-motion='active'] .transformation-section { position: relative; isolation: isolate; overflow: clip; }
+[data-scroll-motion='active'] .transformation-heading { position: relative; z-index: 2; }
+[data-scroll-motion='active'] .editorial-gallery { perspective: 1400px; position: relative; z-index: 1; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .transformation-section { padding-top: 140px; padding-bottom: 150px; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .transformation-heading h2 { font-size: clamp(65px,7vw,108px); }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .editorial-gallery { margin-top: 120px; gap: 70px 9%; grid-template-columns: 1.12fr .88fr; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .look-feature .look-image { height: clamp(560px,75svh,850px); }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .look-secondary { padding-top: 180px; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .look-secondary .look-image { height: clamp(360px,47svh,590px); }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .look-image { box-shadow: 0 30px 60px #2b24151a; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .gallery-note { padding: 40px 0 0; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .gallery-note > p { font-size: clamp(34px,3.5vw,54px); }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .portfolio-depth-word { display: block; position: absolute; top: 32%; left: -8%; z-index: 0; font: 400 15vw/1 var(--serif); letter-spacing: -.045em; color: #cfc4b54d; white-space: nowrap; pointer-events: none; }
+[data-scroll-motion='active'] .image-disclosure { position: relative; z-index: 2; margin-top: 80px; }
+[data-scroll-layout='compact'] .craft-detail { display: none; }
+[data-scroll-layout='compact'] .studio-stage, [data-scroll-layout='compact'] .studio-story { display: contents; }
+
+@media (max-width: 900px) {
+  [data-scroll-motion='active'] .craft-section { height: 100svh; min-height: 580px; padding: 25px 5%; }
+  [data-scroll-motion='active'] .transformation-section { padding-top: 90px; padding-bottom: 90px; }
+  [data-scroll-motion='active'] .editorial-gallery { row-gap: 65px; }
+  [data-scroll-motion='active'] .image-disclosure { margin-top: 45px; }
+
+  /* Mobile: images need overflow:hidden + GPU layer for clip-path reveal to work. */
+  [data-scroll-motion='active'] .look-image {
+    overflow: hidden;
+    /* Promote to GPU compositor layer — prevents janky clip-path transitions on iOS/Android. */
+    transform: translateZ(0);
+    will-change: clip-path;
+  }
+  /* Slightly taller editorial images on mobile so the wipe reveal is dramatic. */
+  [data-scroll-motion='active'] .look-feature .look-image { height: clamp(260px, 72vw, 380px); }
+  [data-scroll-motion='active'] .look-secondary .look-image { height: clamp(220px, 60vw, 320px); }
+
+  /* Studio mobile: ensure image has enough height to show parallax travel. */
+  [data-scroll-motion='active'] .studio-section .studio-image { height: clamp(260px, 62vw, 380px); overflow: hidden; }
+  [data-scroll-motion='active'] .studio-section .studio-image img { position: absolute; inset: -18% 0 auto; width: 100%; height: 136%; }
+}
+/* Section 2 -> 3: a projected aperture in the actual GLB finger ring. */
+[data-scroll-motion='active'] .craft-section { height: 100svh; min-height: 0; background: transparent; }
+[data-scroll-motion='active'] .craft-section::before { content: ''; position: absolute; inset: 0; z-index: -1; background: #090a09; opacity: var(--craft-shell-opacity, 1); pointer-events: none; }
+[data-scroll-motion='active'] .craft-section[data-portal-complete='true'] { pointer-events: none; }
+[data-scroll-motion='active'] .craft-section[data-portal-released='true']::before { opacity: 0; }
+[data-scroll-motion='active'] .craft-section[data-portal-released='true'] .craft-scissors-layer { visibility: hidden; }
+.craft-scissors-viewport { pointer-events: none; }
+[data-scroll-motion='active'] .look-image { position: relative; overflow: hidden; }
+[data-scroll-motion='active'] .look-image img { position: absolute; left: 0; top: -15%; width: 100%; height: 130%; }
+.craft-scissors-layer { position: absolute; inset: 0; z-index: 2; opacity: 0; pointer-events: none; }
+.craft-scissors-layer .craft-scissors-viewport { opacity: 1; }
+.craft-scissors-viewport canvas { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; display: block; }
+.craft-portal-preview { position: absolute; inset: 0; z-index: 0; opacity: 0; overflow: hidden; clip-path: ellipse(0% 0% at 50% 50%); background: #171916; }
+.craft-portal-preview > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 40% center; }
+.craft-portal-title { opacity: 0; }
+[data-scroll-motion='active'] .studio-section.has-ring-entry { position: relative; margin-top: -100svh; padding: 0; z-index: 9; }
+[data-scroll-motion='active'] .studio-section.has-ring-entry .studio-stage { display: block; position: relative; height: 100svh; min-height: 0; overflow: hidden; isolation: isolate; }
+[data-scroll-motion='active'][data-scroll-layout='desktop'] .studio-section.has-ring-entry .studio-stage { position: sticky; top: 0; }
+[data-scroll-motion='active'] .studio-section.has-ring-entry .studio-image { position: absolute; inset: 0; width: 100%; height: 100%; }
+[data-scroll-motion='active'] .studio-section.has-ring-entry .studio-image img { position: absolute; inset: 0; width: 100%; height: 100%; object-position: 40% center; }
+[data-scroll-motion='active'] .studio-section.has-ring-entry .studio-aperture { display: none; }
+[data-scroll-motion='active'] .studio-section.has-ring-entry .studio-depth-title,
+.craft-portal-title { display: block; position: absolute; top: 27%; left: 7%; z-index: 2; font: 400 clamp(68px,13vw,210px)/.85 var(--serif); letter-spacing: -.05em; color: #efe9df; text-shadow: 0 4px 30px #0004; pointer-events: none; }
+.craft-portal-title > span, .craft-portal-title > em { display: block; font-weight: 400; }
+.craft-portal-title > em { margin-left: 20%; color: #e0c69d; }
+[data-scroll-motion='active'] .studio-section.has-ring-entry .studio-image figcaption { left: 7%; right: auto; bottom: 5%; z-index: 3; }
+@media (max-width: 900px), (max-height: 679px) {
+  [data-scroll-layout='compact'] .craft-statement-container { justify-content: flex-start; top: 12%; bottom: auto; padding: 0 5%; }
+  [data-scroll-layout='compact'] .craft-statement-line { font-size: clamp(28px, min(9.4vw, 8.5svh), 66px); }
+  [data-scroll-layout='compact'] .craft-line-mask { padding-bottom: 3px; }
+  [data-scroll-layout='compact'] .craft-top-bar, [data-scroll-layout='compact'] .craft-bottom-bar { gap: 12px; font-size: 7px; letter-spacing: 1px; }
+  [data-scroll-layout='compact'] .craft-location-tag { text-align: right; }
+  [data-scroll-layout='compact'] .craft-scroll-tag { display: none; }
+  [data-scroll-motion='active'] .studio-section.has-ring-entry { display: block; }
+  [data-scroll-motion='active'] .studio-section.has-ring-entry .studio-story { display: block; padding: 70px 7%; background: #171916; }
+  [data-scroll-motion='active'] .studio-section.has-ring-entry .studio-copy { padding: 0; }
+  [data-scroll-motion='active'] .studio-section.has-ring-entry .studio-footnote { margin-top: 45px; }
+  [data-scroll-motion='active'] .studio-section.has-ring-entry .studio-depth-title, .craft-portal-title { top: 31%; font-size: clamp(54px, 16vw, 108px); }
+}
+@media (max-height: 700px) and (max-width: 700px) {
+  [data-scroll-motion='active'] .cinematic-hero, [data-scroll-motion='active'] .cinematic-stage { height: 100svh; min-height: 0; }
+  [data-scroll-motion='active'] .cinematic-brand { padding-top: 30px; }
+  [data-scroll-motion='active'] .cinematic-brand h1.hero-company-name { font-size: clamp(56px,18vw,84px); }
+  [data-scroll-motion='active'] .cinematic-location { margin-bottom: 15px; }
+  [data-scroll-motion='active'] .cinematic-signature { margin-top: 12px; font-size: 6px; letter-spacing: .8px; gap: 8px; }
+  [data-scroll-motion='active'] .hero-description { max-width: 170px; font-size: 10px; line-height: 1.65; margin-top: 13px; }
+  [data-scroll-motion='active'] .hero-visit { margin-top: 16px; padding: 10px 16px; min-height: 48px; min-width: 175px; font-size: 11px; }
+  [data-scroll-motion='active'] .cinematic-bottom { bottom: 18px; }
+  [data-scroll-motion='active'] .services-gallery-section .gallery { min-height: 0; height: 100svh; }
+}
+@media (max-width: 359px) {
+  .top-shell .header { gap: 10px; padding-left: 6%; padding-right: 6%; }
+  .top-shell .brand { gap: 9px; }
+  .top-shell .nav-visit { font-size: 9px; gap: 12px; padding: 10px 12px; white-space: nowrap; }
+  .top-shell .menu-button { font-size: 9px; white-space: nowrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reading-progress { display: none; }
+  .services-gallery-section .gallery { height: auto; min-height: 0; max-height: none; }
+  .services-gallery-section .gallery-stage { display: block; margin-top: 30px; }
+  .services-gallery-section .cards { display: grid; gap: 20px; width: 100%; height: auto; }
+  .services-gallery-section .cards li.ivory-card { position: relative; height: auto; min-height: 270px; cursor: auto; will-change: auto; }
+  .services-gallery-section .gallery-bottom { display: none; }
+}
+
+
+/* Studio -> Work animates the original image and story as one composition. */
+.studio-composition { display: contents; }
+[data-scroll-motion='active'] .studio-section.has-ring-entry { background: transparent; }
+[data-scroll-motion='active'] .studio-composition { display: block; position: relative; background: var(--charcoal); }
+[data-scroll-motion='active'] .studio-composition .studio-stage { isolation: isolate; }
+[data-scroll-motion='active'] .transformation-section { margin-top: -100svh; }
+[data-scroll-motion='active'][data-scroll-layout='compact'] .transformation-section { margin-top: -80svh; }
+/* The pin spacer must stay transparent so the real Gallery can show beneath it. */
+[data-scroll-motion='active'] main { background: var(--paper); }
+[data-scroll-motion='active'] .pin-spacer-studio-gallery-cut { background: transparent; }

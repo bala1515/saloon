@@ -1,0 +1,19 @@
+{
+  "name": "ABC Atelier 01",
+  "origin": "Original mesh authored for this project; not downloaded",
+  "license": "CC0-1.0",
+  "bytes": 3309192,
+  "sha256": "24e4877907f44ed514cab17d7bd9c32ef25864b5882ea9b8651bd29f71004ba1",
+  "triangles": 45800,
+  "meshes": 14,
+  "features": [
+    "lofted ergonomic shell",
+    "contoured grip inlay and machined ribs",
+    "31 fixed and 27 moving blade teeth",
+    "countersunk screws",
+    "power slider",
+    "sculpted taper lever",
+    "inlaid ABC monogram"
+  ],
+  "generator": "script/build-atelier-clipper.mjs"
+}

@@ -1,0 +1,14 @@
+ABC Atelier 01 — original clipper mesh
+
+This model was created for this project by script/build-atelier-clipper.mjs.
+It contains no downloaded geometry, brand/product scans or third-party textures.
+It is an original design concept, not a certified manufacturer's CAD model.
+
+The project-authored mesh and generator are made available under CC0 1.0:
+https://creativecommons.org/publicdomain/zero/1.0/
+
+To the extent possible under law, the authors waive copyright and related rights
+in this original mesh and generator. You may use, modify and redistribute them,
+including commercially, without attribution. No warranty is provided.
+
+Three.js is a separate MIT-licensed dependency; its license is unchanged.

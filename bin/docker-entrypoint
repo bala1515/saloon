@@ -1,0 +1,18 @@
+#!/bin/bash -e
+
+# Prepare all four Rails databases before starting the Render web process.
+if [ "${1:-}" = "./bin/rails" ] && [ "${2:-}" = "server" ]; then
+  for required_key in DB_HOST DB_PORT DB_USERNAME DB_PASSWORD; do
+    if [ -z "${!required_key}" ]; then
+      echo "Missing required environment variable: ${required_key}" >&2
+      exit 1
+    fi
+  done
+  if [ ! -r "${DB_SSL_CA:-/etc/secrets/aiven-ca.pem}" ]; then
+    echo "Aiven CA certificate missing. Add aiven-ca.pem in Render Secret Files." >&2
+    exit 1
+  fi
+  ./bin/rails db:prepare
+fi
+
+exec "${@}"

@@ -1,0 +1,48 @@
+/* A reserved visual layer only: approved typography, content, CTA and page styles are untouched. */
+.clipper-hero-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.6s ease;
+}
+.clipper-hero-layer[data-status='ready'] { opacity: 1; }
+.clipper-hero-layer[data-opening-active='true'][data-status='ready'] { z-index: 6; transition: none; }
+.cinematic-hero:not([data-opening-phase='complete']) .cinematic-stage { z-index: 11; }
+.top-shell:has(.cinematic-hero:not([data-opening-phase='complete'])) > .header { opacity: 0; pointer-events: none; }
+.top-shell > .header { transition: opacity .7s ease; }
+.hero-opening-cover { position: absolute; inset: 0; z-index: 5; background: #efe9df; display: grid; place-items: center; }
+.hero-opening-cover[data-loading='false'] { visibility: hidden; }
+.opening-monogram { color: #34332c; font: 400 58px/1 var(--serif); text-align: center; letter-spacing: 3px; }
+.opening-monogram > span { display: block; font: 500 8px/1 var(--sans); letter-spacing: 3px; margin-top: 20px; }
+.hero-opening-skip { position: absolute; top: 35px; right: 5.5%; z-index: 8; background: #efe9dfcc; border: 1px solid #9c8e7770; color: #494333; padding: 12px 16px; font-size: 10px; letter-spacing: 1px; }
+.hero-opening-skip > span { margin-left: 18px; }
+.cinematic-brand h1.hero-company-name { font-size: clamp(94px,9.5vw,148px); line-height: .87; letter-spacing: -.025em; }
+.hero-company-name .brand-reveal { white-space: nowrap; }
+.clipper-hero-status {
+  position: absolute;
+  top: 69%;
+  left: 65%;
+  right: 5%;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.8;
+  letter-spacing: 1px;
+  text-align: center;
+  pointer-events: none;
+}
+.clipper-hero-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  contain: layout paint;
+}
+.clipper-hero-viewport canvas { display: block; width: 100%; height: 100%; }
+@media (max-width: 540px) {
+  .cinematic-brand h1.hero-company-name { font-size: clamp(65px,20vw,92px); }
+  .hero-opening-skip { top: 25px; }
+  .clipper-hero-status { top: auto; bottom: 17%; left: 8%; right: 7%; text-align: left; font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .clipper-hero-layer { transition: none; }
+}

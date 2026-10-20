@@ -1,0 +1,11 @@
+ABC Atelier Shears 01 — original scissors mesh
+
+Created for ABC Salon by script/build-atelier-scissors.mjs. No downloaded geometry,
+brand scans or third-party textures are included. This is an original design concept,
+not a manufacturer's certified CAD model.
+
+The original mesh and generator are made available under CC0 1.0:
+https://creativecommons.org/publicdomain/zero/1.0/
+To the extent possible under law, the authors waive copyright and related rights.
+Use, modify and redistribute, including commercially, without attribution.
+No warranty is provided. Three.js remains a separate MIT-licensed dependency.

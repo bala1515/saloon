@@ -1,0 +1,71 @@
+# MySQL. Versions 5.6.4 and up are supported.
+#
+# Install the MySQL driver
+#   gem install mysql2
+#
+# Ensure the MySQL gem is defined in your Gemfile
+#   gem "mysql2"
+#
+# And be sure to use new-style password hashing:
+#   https://dev.mysql.com/doc/refman/5.7/en/password-hashing.html
+#
+default: &default
+  adapter: mysql2
+  encoding: utf8mb4
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: admin
+  password: root
+  socket: /var/run/mysqld/mysqld.sock
+
+development:
+  <<: *default
+  database: saloon_development
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *default
+  database: saloon_test
+
+# As with config/credentials.yml, you never want to store sensitive information,
+# like your database password, in your source code. If your source code is
+# ever seen by anyone, they now have access to your database.
+#
+# Instead, provide the password or a full connection URL as an environment
+# variable when you boot the app. For example:
+#
+#   DATABASE_URL="mysql2://myuser:mypass@localhost/somedatabase"
+#
+# If the connection URL is provided in the special DATABASE_URL environment
+# variable, Rails will automatically merge its configuration values on top of
+# the values provided in this file. Alternatively, you can specify a connection
+# URL environment variable explicitly:
+#
+#   # Aiven/Render use TCP and a verified CA, never the local development socket.
+# Set these values in Render's Environment page; no credentials belong here.
+production:
+  primary: &primary_production
+    adapter: mysql2
+    encoding: utf8mb4
+    max_connections: <%= ENV.fetch("RAILS_MAX_THREADS", 3).to_i %>
+    host: <%= ENV["DB_HOST"].to_json %>
+    port: <%= ENV.fetch("DB_PORT", 3306).to_i %>
+    username: <%= ENV["DB_USERNAME"].to_json %>
+    password: <%= ENV["DB_PASSWORD"].to_json %>
+    database: <%= ENV.fetch("DB_NAME", "defaultdb").to_json %>
+    ssl_mode: verify_ca
+    sslca: <%= ENV.fetch("DB_SSL_CA", "/etc/secrets/aiven-ca.pem").to_json %>
+    connect_timeout: 10
+  cache:
+    <<: *primary_production
+    database: <%= ENV.fetch("DB_CACHE_NAME", "saloon_production_cache").to_json %>
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: <%= ENV.fetch("DB_QUEUE_NAME", "saloon_production_queue").to_json %>
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    database: <%= ENV.fetch("DB_CABLE_NAME", "saloon_production_cable").to_json %>
+    migrations_paths: db/cable_migrate

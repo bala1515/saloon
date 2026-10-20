@@ -1,0 +1,25 @@
+{
+  "name": "ABC Atelier Shears 01",
+  "origin": "Original project-authored mesh; not downloaded",
+  "license": "CC0-1.0",
+  "bytes": 2209748,
+  "sha256": "cca98ecb2e27c196d4177cf747063b1f9340a2d43e37c78d23cfe0d7fcad626f",
+  "triangles": 30548,
+  "meshes": 12,
+  "pivotNodes": [
+    "ScissorHalfA",
+    "ScissorHalfB",
+    "ScissorPivot"
+  ],
+  "features": [
+    "two closed convex blade meshes",
+    "separate honed edges",
+    "forged offset shanks",
+    "oval through-hole finger rings",
+    "soft finger inserts",
+    "sculpted finger rest",
+    "knurled champagne tension dial",
+    "slotted central screw"
+  ],
+  "generator": "script/build-atelier-scissors.mjs"
+}
