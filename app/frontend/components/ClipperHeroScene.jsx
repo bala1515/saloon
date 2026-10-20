@@ -28,6 +28,13 @@ export default function ClipperHeroScene({ config, skipOpening, paused, reduced,
     if (!element || !config.modelUrl) return
     const hero=element.closest('.cinematic-hero')
     let scrollProgress=Number(hero?.dataset.sceneProgress)||0
+    const pointer = { x: 0, y: 0 }
+    function pointerChange(event) {
+      pointer.x = THREE.MathUtils.clamp(event.detail.x || 0, -1, 1)
+      pointer.y = THREE.MathUtils.clamp(event.detail.y || 0, -1, 1)
+      requestFrame()
+    }
+    hero?.addEventListener('salon:hero-pointer', pointerChange)
     function scrollChange(event) {
       scrollProgress=event.detail.progress
       requestFrame()
@@ -61,6 +68,9 @@ export default function ClipperHeroScene({ config, skipOpening, paused, reduced,
       element.dataset.paperStage=opening.peel===0?'cut':opening.peel<.75?'curl':'depart'
       const seconds = playback.current.reduced ? 0 : opening.heroTime
       const pose = clipperPose(seconds)
+      const interactive = !playback.current.reduced && !playback.current.paused
+      const pointerX = interactive ? pointer.x * .10 : 0
+      const pointerY = interactive ? pointer.y * .055 : 0
       const reveal = opening.zoom
       const composition = heroComposition(seconds,width,height,slot)
       const viewpoint = composition.camera
@@ -75,7 +85,7 @@ export default function ClipperHeroScene({ config, skipOpening, paused, reduced,
       camera.lookAt(anchorX+travel.orbit*blend*.65, anchorY+travel.lift*blend*.5, 0)
       element.dataset.cameraDistance=camera.position.z.toFixed(3)
       element.dataset.scrollProgress=travel.progress.toFixed(3)
-      clipper.rig.rotation.set(pose.x+travel.tilt*blend, pose.y - (1 - reveal) * 0.35+travel.turn*blend, pose.z + (1 - reveal) * 0.06)
+      clipper.rig.rotation.set(pose.x+travel.tilt*blend+pointerY, pose.y+pointerX - (1 - reveal) * 0.35+travel.turn*blend, pose.z + (1 - reveal) * 0.06)
       clipper.rig.position.set(composition.clipper.x*zoom,(composition.clipper.y + (playback.current.reduced ? 0 : Math.sin(seconds * .28) * .028))*zoom,composition.clipper.z)
       clipper.rig.updateMatrixWorld(true)
       bladeCenter.copy(clipper.bladeCenter).applyMatrix4(clipper.rig.matrixWorld)
@@ -94,7 +104,7 @@ export default function ClipperHeroScene({ config, skipOpening, paused, reduced,
         const introScale=Math.min(340,height*.42,width*.62)/height*viewHeight/config.scissors.normalizedHeight
         const cut=paperCutPath(opening.cut)
         introRotation.setFromEuler(new THREE.Euler(-.12,.10,-Math.atan(cut.dx*width/height)))
-        restingRotation.setFromEuler(new THREE.Euler(shearPose.x,shearPose.y-travel.turn*.35,shearPose.z+composition.scissors.angleOffset-travel.tilt))
+        restingRotation.setFromEuler(new THREE.Euler(shearPose.x-pointerY*.6,shearPose.y-pointerX*.7-travel.turn*.35,shearPose.z+composition.scissors.angleOffset-travel.tilt))
         cutPosition.copy(scissors.cutPoint).multiplyScalar(introScale).applyQuaternion(introRotation)
         cutPosition.negate().add(new THREE.Vector3((cut.x-.5)*viewWidth,(cut.y-.5)*viewHeight,.8))
         scissors.rig.position.copy(cutPosition).lerp(new THREE.Vector3(composition.scissors.x*zoom-travel.separation,composition.scissors.y*zoom+travel.lift,composition.scissors.z-travel.separation),progress)
@@ -141,9 +151,9 @@ export default function ClipperHeroScene({ config, skipOpening, paused, reduced,
       camera.updateProjectionMatrix()
       paper?.resize(width,height)
       const stage=element.closest('.cinematic-stage'), stageBounds=stage?.getBoundingClientRect()
-      const headline=stage?.querySelector('h1')?.getBoundingClientRect()
+      const headline=stage?.querySelector('.cinematic-brand')?.getBoundingClientRect()
       const controls=stage?.querySelector('.cinematic-bottom')?.getBoundingClientRect()
-      slot=headline&&controls?{top:Math.max(height*.43,headline.bottom-stageBounds.top-30),bottom:controls.top-stageBounds.top-28}:null
+      slot=headline&&controls?{top:Math.max(height*.43,headline.bottom-stageBounds.top+25),bottom:controls.top-stageBounds.top-28}:null
       particleGeometry?.setDrawRange(0, compact ? 6 : 12)
       if(shadowKey) {
         const mapSize=compact?512:1024
@@ -164,6 +174,7 @@ export default function ClipperHeroScene({ config, skipOpening, paused, reduced,
       controller.abort(); cancelAnimationFrame(frame)
       resizeObserver?.disconnect()
       hero?.removeEventListener('salon:hero-scroll',scrollChange)
+      hero?.removeEventListener('salon:hero-pointer',pointerChange)
       document.removeEventListener('visibilitychange', visibilityChange)
       renderer?.domElement.removeEventListener('webglcontextlost', contextLost)
       disposeModel([clipper?.rig, importedScene, scissors?.rig, importedScissors].filter(Boolean))
@@ -261,7 +272,7 @@ export default function ClipperHeroScene({ config, skipOpening, paused, reduced,
         softbox.position.set(-1.8, 3.5, 4); softbox.lookAt(1.5, 0, 0); scene.add(softbox)
         const strip = new THREE.RectAreaLight(0xe5efff,1.4,1,4)
         strip.position.set(4,1.5,3);strip.lookAt(1.5,0,0);scene.add(strip)
-        const rim = new THREE.DirectionalLight(0xd3b887, 1.7)
+        const rim = new THREE.DirectionalLight(0x8de1ce, 1.7)
         rim.position.set(3.5, 2.5, -2); scene.add(rim)
         sweepLight = new THREE.RectAreaLight(0xffe4ae, 4, 0.035, Math.max(clipper.bladeSize.y * 1.3, 0.16))
         scene.add(sweepLight)
@@ -285,7 +296,7 @@ export default function ClipperHeroScene({ config, skipOpening, paused, reduced,
         }
         particleGeometry = new THREE.BufferGeometry()
         particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-        particleMaterial = new THREE.PointsMaterial({ color: 0xc4a878, size: 0.015, transparent: true, opacity: 0.18, depthWrite: false })
+        particleMaterial = new THREE.PointsMaterial({ color: 0x0a7c6e, size: 0.015, transparent: true, opacity: 0.18, depthWrite: false })
         particles = new THREE.Points(particleGeometry, particleMaterial)
         scene.add(particles)
         // The ivory cut and the same articulated scissors share this renderer.

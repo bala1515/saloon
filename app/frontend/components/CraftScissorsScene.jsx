@@ -54,7 +54,7 @@ export default function CraftScissorsScene() {
         THREE.MathUtils.lerp(-.14 + pointer.x * .10, 0, straighten),
         THREE.MathUtils.lerp(.48 + pointer.x * .035, 0, straighten),
       )
-      prepared.rig.position.set(0, compact ? -.85 : 0, 0)
+      prepared.rig.position.set(compact ? 0 : 1.05, compact ? -.85 : 0, 0)
       prepared.rig.updateMatrixWorld(true)
       ring.fromArray(fingerPortal.center)
       prepared.halfA.localToWorld(ring)
@@ -200,4 +200,3 @@ export default function CraftScissorsScene() {
     </div>
   </div>
 }
-

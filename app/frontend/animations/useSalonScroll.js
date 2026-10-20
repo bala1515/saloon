@@ -2,7 +2,7 @@ import { useLayoutEffect } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-import { craftPortalFrame } from '../three/craftPortal.js'
+
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -10,9 +10,8 @@ gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true, limitCallbacks: true })
 
 /**
- * Premium scroll experience — OnePlus-style momentum with visible mobile effects.
- * Desktop: full depth parallax + pinned studio lens.
- * Mobile: bold clip-path reveals, strong y-travel, momentum scrub.
+ * Native reading flow with a scroll-responsive hero camera and image depth.
+ * All text stays in place. Reduced motion skips scroll effects entirely.
  */
 export default function useSalonScroll() {
   useLayoutEffect(() => {
@@ -37,9 +36,7 @@ export default function useSalonScroll() {
     const navigateToHash = (hash, behavior = 'smooth') => {
       const id = hash.slice(1), target = document.getElementById(id)
       if (!target) return
-      const craftTrigger = ScrollTrigger.getById('craft-ring-portal')
-      const top = id === 'top' ? 0 : id === 'craft' && craftTrigger
-        ? craftTrigger.start : target.getBoundingClientRect().top + window.scrollY - 28
+      const top = id === 'top' ? 0 : target.getBoundingClientRect().top + window.scrollY - 28
       ScrollTrigger.getAll().forEach(trigger => trigger.getTween(true)?.kill?.())
       window.scrollTo({ top: Math.max(0, top), behavior })
     }
@@ -76,272 +73,75 @@ export default function useSalonScroll() {
     media.add({
       desktop: '(min-width: 901px) and (min-height: 680px)',
       compact: '(max-width: 900px), (max-height: 679px)',
+      mobile: '(max-width: 760px) and (min-height: 560px)',
       reduced: '(prefers-reduced-motion: reduce)',
     }, context => {
-      const { desktop, reduced } = context.conditions
+      const { desktop, mobile, reduced } = context.conditions
       root.dataset.scrollMotion = reduced ? 'reduced' : 'active'
-      root.dataset.scrollLayout = desktop ? 'desktop' : 'compact'
-      if (reduced) {
-        gsap.set('.craft-line-1, .craft-line-2, .craft-line-3, .craft-scissors-layer, .craft-top-bar, .craft-bottom-bar', {
-          opacity: 1,
-          yPercent: 0,
-          scale: 1,
-          rotation: 0,
-          y: 0,
-        })
-        return
-      }
+      root.dataset.scrollLayout = mobile ? 'mobile' : desktop ? 'desktop' : 'compact'
       const q = gsap.utils.selector(root)
-
-      // Mobile travels at 55% of desktop (was 35% — now clearly visible on phone).
-      const span = desktop ? 1 : .55
-      // Momentum scrub: desktop snappy, mobile smooth (feels like you're pulling content).
-      const SCRUB = desktop ? .55 : .6
-
-      const move = (target, from, to, trigger, start = 'top bottom', end = 'bottom top', scrub = SCRUB) => {
-        const els = q(target)
-        if (!els.length) return
-        return gsap.fromTo(els, from, { ...to, ease: 'none',
-          scrollTrigger: { trigger: q(trigger)[0] || q(target)[0], start, end, scrub, invalidateOnRefresh: true } })
-      }
-
-      /* ─── SECTION 1 -> SECTION 2 CURTAIN OVERLAY REVEAL ─── */
-      const heroShell = q('#top')[0]
-      const craftSec = q('#craft')[0]
-      const studioSec = q('#studio')[0]
-      const portal = { progress: 0 }
-      const sendPortal = () => {
-        if (!craftSec) return
-        craftSec.dataset.portalProgress = portal.progress.toFixed(5)
-        craftSec.dataset.portalComplete = String(portal.progress >= .99999)
-        craftSec.style.setProperty('--craft-shell-opacity', 1 - craftPortalFrame(portal.progress).handoff)
-        craftSec.dispatchEvent(new CustomEvent('salon:craft-portal', { detail: { progress: portal.progress } }))
-      }
-
-      if (heroShell && craftSec) {
-        studioSec?.classList.add('has-ring-entry')
-        // Pin Section 1 in place while user scrolls through the fade transition
-        // Section 1 stays firmly in place (no receding/scaling backwards)
-        ScrollTrigger.create({
-          trigger: heroShell,
-          start: 'top top',
-          end: '+=100%',
-          pin: heroShell,
-          pinSpacing: false,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-        })
-
-        // Pure black fade: dissolves hero into black ONLY when scrolling down
-        const veil = q('.hero-scroll-veil')[0]
-        if (veil) {
-          gsap.fromTo(veil,
-            { opacity: 0 },
-            {
-              opacity: 1,
-              ease: 'power1.inOut',
-              scrollTrigger: {
-                trigger: craftSec,
-                start: 'top bottom',
-                end: 'top top',
-                scrub: true,
-                invalidateOnRefresh: true,
-              }
-            }
-          )
-        }
-
-        // Dynamic feather that fades in ONLY when scrolling starts (0% opacity at scroll 0)
-        const feather = q('.craft-scroll-feather')[0]
-        if (feather) {
-          gsap.fromTo(feather,
-            { opacity: 0 },
-            {
-              opacity: 1,
-              ease: 'power1.out',
-              scrollTrigger: {
-                trigger: craftSec,
-                start: 'top bottom',
-                end: 'top 80%',
-                scrub: true,
-                invalidateOnRefresh: true,
-              }
-            }
-          )
-        }
-
-        // Section 2 initial state: completely hidden and positioned inside line masks
-        gsap.set('.craft-line-1, .craft-line-2, .craft-line-3', { yPercent: 110, opacity: 0 })
-        gsap.set('.craft-line-1', { yPercent: 18, opacity: .3 })
-        gsap.set('.craft-scissors-layer', { scale: 0.6, opacity: 0, rotation: -18 })
-        gsap.set('.craft-top-bar, .craft-bottom-bar', { opacity: 0, y: 12 })
-
-        // Section 2 Pinned Scrollytelling Sequence:
-        // Section 2 locks full screen. Section 3 is held completely off screen.
-        // Scroll progression:
-        // 1. Black is full screen. First text line appears ("SHARPEN THE CRAFT").
-        // 2. Scroll further: Second line ("SHAPE THE VISION") + 3D Scissors appear.
-        // 3. Scroll further: Third line ("CUT BEYOND") appears.
-        // 4. Straighten, align to the finger hole, pass through, then release to Section 3.
-        const craftTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: craftSec,
-            start: 'top top',
-            id: 'craft-ring-portal',
-            end: desktop ? '+=290%' : '+=270%',
-            pin: true,
-            scrub: desktop ? .65 : .55,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            onLeave: self => {
-              // Release must finish with the physical pin; scrub lag otherwise
-              // leaves a shifted copy of the studio over its real photograph.
-              craftSec.dataset.portalReleased = 'true'
-              self.getTween()?.progress?.(1)
-              portal.progress = 1; sendPortal()
-            },
-            onEnterBack: () => { craftSec.dataset.portalReleased = 'false' },
-            onRefresh: self => { craftSec.dataset.portalReleased = String(self.progress === 1) },
-          }
-        })
-
-        craftTl
-          // Micro-bars fade in at the start of Section 2 lock
-          .to('.craft-top-bar, .craft-bottom-bar', {
-            opacity: 1,
-            y: 0,
-            duration: 0.35,
-            ease: 'power2.out',
-          }, 0)
-
-          // Step 1: First line reveals ("SHARPEN THE CRAFT")
-          .to('.craft-line-1', {
-            yPercent: 0,
-            opacity: 1,
-            duration: 0.85,
-            ease: 'power3.out',
-          }, 0)
-
-          // Step 2: Second line reveals ("SHAPE THE VISION") + 3D Scissors appears
-          .to('.craft-line-2', {
-            yPercent: 0,
-            opacity: 1,
-            duration: 0.85,
-            ease: 'power3.out',
-          }, 1.0)
-          .to('.craft-scissors-layer', {
-            scale: 1,
-            opacity: 1,
-            rotation: 0,
-            duration: 0.95,
-            ease: 'power2.out',
-          }, 1.0)
-
-          // Step 3: Third line reveals ("CUT BEYOND")
-          .to('.craft-line-3', {
-            yPercent: 0,
-            opacity: 1,
-            duration: 0.85,
-            ease: 'power3.out',
-          }, 2.0)
-
-          // Hold the complete statement, then transfer control to the actual 3D camera.
-          .to({}, { duration: 0.45 })
-          .to('.craft-statement-container, .craft-top-bar, .craft-bottom-bar', {
-            opacity: 0, duration: .45, ease: 'power1.inOut',
-          }, 3.4)
-          .to('.craft-scroll-feather', { opacity: 0, duration: .35 }, 3.4)
-          .to(portal, { progress: 1, duration: 3.1, ease: 'none', onUpdate: sendPortal }, 3.4)
-      }
-
-      /* ─── STUDIO SECTION ─── */
-      if (desktop) {
-        // Desktop: pinned aperture lens open + floating depth title.
-        gsap.set('.studio-aperture-left, .studio-aperture-right', { scaleX: 0 })
-        move('.studio-image img', { yPercent: 0, scale: 1 }, { yPercent: -3, scale: 1.08 }, '#studio', 'top top', 'bottom top', .6)
-        const story = gsap.timeline({ scrollTrigger: {
-          trigger: '#studio', start: 'top top', end: 'bottom bottom', scrub: .65, invalidateOnRefresh: true,
+      if (reduced) return
+      // Desktop gets independent image depth; phones get one deliberate image reel.
+      const gallery = q('.editorial-gallery')[0]
+      const gallerySection = q('#transformations')[0]
+      if (mobile && gallery) {
+        gallery.classList.add('is-scroll-reel')
+        gallerySection.classList.add('has-scroll-reel')
+        const feature = gallery.querySelector('.look-feature')
+        const secondary = gallery.querySelector('.look-secondary')
+        gsap.set(secondary.querySelector('.look-image'), { clipPath: 'inset(0% 0% 0% 100%)' })
+        gsap.timeline({ scrollTrigger: {
+          id: 'salon-mobile-reel', trigger: gallery, start: 'top 15%',
+          end: () => `+=${Math.round(window.innerHeight * .85)}`,
+          pin: true, scrub: .3, anticipatePin: 1, invalidateOnRefresh: true,
         } })
-        story
-          .fromTo('.studio-depth-title', { y: 0, xPercent: 0, scale: 1 }, { y: () => -innerHeight * .34, xPercent: 7, scale: 1.08, duration: 1, ease: 'none' }, 0)
-          .to('.studio-depth-title', { opacity: 0, duration: .35 }, .42)
-          .fromTo('.studio-scrim', { opacity: 0 }, { opacity: 1, duration: .8, ease: 'none' }, .1)
-        move('.studio-copy', { y: 55 }, { y: -35 }, '.studio-story', 'top bottom', 'bottom bottom')
-      } else {
-        // Mobile: image zooms out as you scroll past, text slides up from below.
-        move('.studio-image img', { yPercent: 0, scale: 1 }, { yPercent: -3, scale: 1.08 }, '.studio-section', 'top top', 'bottom top', .6)
-        move('.studio-copy', { y: 35 }, { y: -20 }, '.studio-section', 'top 80%', 'bottom bottom', .6)
+          .to(feature.querySelector('.look-image'), { xPercent: -8, scale: .96, ease: 'none', duration: 1 }, 0)
+          .to(feature.querySelector('figcaption'), { opacity: 0, duration: .12, ease: 'none' }, .75)
+          .fromTo(secondary.querySelector('figcaption'), { opacity: 0 }, { opacity: 1, duration: .15, ease: 'none' }, .85)
+          .to(feature.querySelector('img'), { scale: 1.12, ease: 'none', duration: 1 }, 0)
+          .to(secondary.querySelector('.look-image'), { clipPath: 'inset(0% 0% 0% 0%)', ease: 'none', duration: .75 }, .15)
+          .fromTo(secondary.querySelector('img'), { scale: 1.15, xPercent: 4 }, {
+            scale: 1, xPercent: 0, ease: 'none', duration: .85,
+          }, .15)
+          .fromTo(gallerySection, { '--reel-progress': 0 }, { '--reel-progress': 1, ease: 'none', duration: 1 }, 0)
       }
-
-      /* ─── TRANSFORMATIONS / GALLERY ─── */
-      move('.portfolio-depth-word', { xPercent: 8 }, { xPercent: -24 }, '#transformations', 'top bottom', 'bottom top', .8)
-      // Pin the existing Studio at its last readable viewport. Animate its
-      // original composition, including the story, rather than a second image.
-      const composition = q('.studio-composition')[0]
-      if (composition && studioSec) {
-        const aperture = (closed = false) => {
-          const height = composition.offsetHeight
-          const viewport = Math.min(innerHeight, height)
-          const center = height - viewport / 2
-          const half = closed ? 1 : viewport / 2
-          return `inset(${(center - half) / height * 100}% ${closed ? 7 : 0}% ${(height - center - half) / height * 100}% ${closed ? 7 : 0}%)`
-        }
-        gsap.set(composition, { transformOrigin: '50% calc(100% - 50svh)' })
-        gsap.timeline({
-          onUpdate() { if (this.scrollTrigger?.progress === 0) composition.style.clipPath = 'none' },
-          scrollTrigger: {
-          id: 'studio-gallery-cut', trigger: studioSec, start: 'bottom bottom',
-          onLeaveBack: self => { self.getTween()?.progress?.(1); composition.style.clipPath = 'none' },
-          onRefresh: self => { if (self.progress === 0) composition.style.clipPath = 'none' },
-          end: () => `+=${innerHeight * (desktop ? 1 : .8)}`,
-          pin: true, scrub: .4, anticipatePin: 1, invalidateOnRefresh: true,
-          onLeave: self => self.getTween()?.progress?.(1),
-        } })
-          .fromTo(composition, { scale: 1, clipPath: () => aperture() },
-            { scale: .88, clipPath: () => aperture(true), duration: 1, ease: 'power2.inOut', immediateRender: false }, 0)
-          .to(composition, { opacity: 0, duration: .15 }, .9)
-        gsap.fromTo('.transformation-heading', { opacity: .2, y: 40 }, {
-          opacity: 1, y: 0, ease: 'none', scrollTrigger: {
-            trigger: '#transformations', start: 'top 80%', end: 'top 15%', scrub: .35,
+      q('.depth-image').forEach(frame => {
+        if (mobile && frame.closest('.editorial-gallery')) return
+        gsap.fromTo(frame.querySelector('img'), { scale: desktop ? 1.12 : 1.18, yPercent: desktop ? -3 : 0 }, {
+          scale: 1, yPercent: desktop ? 3 : 0, ease: 'none', scrollTrigger: {
+            trigger: frame, start: 'top bottom', end: mobile ? 'bottom 55%' : 'bottom top', scrub: .4,
           },
         })
-      }
-      // Mobile: images travel on different Y planes → creates clear depth without 3D rotation.
-      move('.look-feature',
-        { y: 100 * span, rotationY: desktop ? -5 : 0, rotationZ: desktop ? -2 : 0 },
-        { y: -100 * span, rotationY: desktop ? 3 : 0, rotationZ: desktop ? 1 : 0 },
-        '#transformations')
-      move('.look-secondary',
-        { y: 230 * span, rotationY: desktop ? 6 : 0, rotationZ: desktop ? 3 : 0 },
-        { y: -200 * span, rotationY: desktop ? -4 : 0, rotationZ: desktop ? -2 : 0 },
-        '#transformations')
-      // Inner image drift — visible even on mobile with 55% span.
-      move('.look-feature img',   { yPercent: -9, scale: 1.04 }, { yPercent: 9, scale: 1 }, '.look-feature')
-      move('.look-secondary img', { yPercent: -9, scale: 1.04 }, { yPercent: 9, scale: 1 }, '.look-secondary')
-      move('.gallery-note', { y: 90 * span }, { y: -55 * span }, '#transformations')
-
-      /* ─── MOBILE CLIP-PATH REVEAL — image wipe on entry ─── */
-      if (!desktop) {
-        // Wipe completes when the element's CENTER crosses 60% of viewport
-        // — ensures full reveal well before the section exits screen.
-        q('.look-image').forEach(wrap => {
-          gsap.fromTo(wrap,
-            { clipPath: 'inset(18% 0% 0% 0%)' },
-            { clipPath: 'inset(0% 0% 0% 0%)', ease: 'none',
-              scrollTrigger: {
-                trigger: wrap,
-                start: 'top 98%',   // begin as soon as element edge enters
-                end: 'center 62%',  // complete when element center is at 62% — always before exit
-                scrub: .5,
-                invalidateOnRefresh: true
-              } })
-        })
-      }
-
-      /* ─── REVIEWS (quiet, stable) ─── */
-      // Keep the review columns aligned and still while visitors read or paginate.
-
-
+      })
+      // The teal service panel expands into the viewport; its text stays still.
+      gsap.fromTo('.service-menu-section', { clipPath: `inset(0% ${mobile ? 3 : 5}% 0% ${mobile ? 3 : 5}%)` }, {
+        clipPath: 'inset(0% 0% 0% 0%)', ease: 'none', scrollTrigger: {
+          trigger: '.service-menu-section', start: 'top 98%', end: 'top 45%', scrub: .25,
+        },
+      })
+      // A graphic orbit, rather than a pinned reading section, carries the hero out.
+      gsap.to('.hero-orbit', { rotation: mobile ? 48 : 22, scale: mobile ? .86 : 1, y: desktop ? 65 : -35, ease: 'none', scrollTrigger: {
+        trigger: '.cinematic-stage', start: 'top top', end: 'bottom top', scrub: .4,
+      } })
+      q('.section-heading').forEach(heading => gsap.fromTo(heading, {
+        '--accent-progress': 0,
+      }, { '--accent-progress': 1, duration: 1, scrollTrigger: {trigger:heading,start:'top 85%',once:true} }))
+      // Give each visual a distinct motion: a framing reveal and a rotating craft mark.
+      gsap.fromTo('.studio-image img', { clipPath: mobile ? 'inset(0% 14% 0% 14%)' : 'inset(7% 0% 7% 0%)' }, {
+        clipPath: 'inset(0% 0% 0% 0%)', ease: 'none', scrollTrigger: {
+          trigger: '.studio-image', start: 'top 95%', end: mobile ? 'center 55%' : 'center 65%', scrub: .3,
+        },
+      })
+      gsap.fromTo('.gallery-statement > span', { rotation: -25 }, {
+        rotation: 95, ease: 'none', scrollTrigger: {
+          trigger: '.editorial-gallery', start: 'top bottom', end: 'bottom top', scrub: .6,
+        },
+      })
+      gsap.fromTo('.service-menu-list', { '--menu-rule': 0 }, {
+        '--menu-rule': 1, ease: 'none', scrollTrigger: {
+          trigger: '.service-menu-list', start: 'top 95%', end: 'top 50%', scrub: .4,
+        },
+      })
       /* ─── READING PROGRESS BAR ─── */
       gsap.fromTo('.reading-progress', { scaleX: 0 }, { scaleX: 1, ease: 'none',
         scrollTrigger: { trigger: root, start: 'top top', end: 'bottom bottom', scrub: .15 } })
@@ -359,14 +159,11 @@ export default function useSalonScroll() {
         const ready = hero.dataset.openingPhase === 'complete' && !hero.classList.contains('motion-paused')
         if (!ready) { heroTimeline?.scrollTrigger.disable(false); return }
         if (heroTimeline) { heroTimeline.scrollTrigger.enable(false); return }
-        // Lock transform origin before GSAP takes ownership.
-        gsap.set('.cinematic-brand', { yPercent: -50, y: 0, scale: 1 })
+        // Only the 3D camera responds to scroll; text keeps its layout position.
         heroTimeline = gsap.timeline({ scrollTrigger: {
-          id: 'salon-hero', trigger: hero, start: 'top top', end: '+=100%', scrub: desktop ? .65 : .6, invalidateOnRefresh: true,
+          id: 'salon-hero', trigger: hero, start: 'top top', end: mobile ? 'bottom 30%' : 'bottom top', scrub: .25, invalidateOnRefresh: true,
         } })
           .to(camera, { progress: 1, duration: 1, ease: 'none', onUpdate: sendCamera }, 0)
-          .to('.cinematic-brand', { y: desktop ? -65 : -22, scale: desktop ? .94 : .97, transformOrigin: 'left center', duration: 1, ease: 'none' }, 0)
-          .to('.cinematic-bottom', { y: -20, duration: 1, ease: 'none' }, 0)
       })
       context.syncHero()
       const observer = new MutationObserver(() => context.syncHero())
@@ -375,16 +172,21 @@ export default function useSalonScroll() {
       refresh()
       return () => {
         observer.disconnect()
+        gallery?.classList.remove('is-scroll-reel')
+        gallerySection?.classList.remove('has-scroll-reel')
 
-        portal.progress = 0; sendPortal()
-        studioSec?.classList.remove('has-ring-entry')
-        if (craftSec) { delete craftSec.dataset.portalProgress; delete craftSec.dataset.portalComplete; delete craftSec.dataset.portalReleased; craftSec.style.removeProperty('--craft-shell-opacity') }
+
         if (hero) { camera.progress = 0; sendCamera(); delete hero.dataset.sceneProgress }
       }
     }, root)
+    // Filtering services changes the offsets of every section below the menu.
+    const menuResize = new ResizeObserver(refresh)
+    const serviceMenu = root.querySelector('.service-menu-section')
+    if (serviceMenu) menuResize.observe(serviceMenu)
     document.fonts?.ready.then(() => { if (!disposed) refresh() })
     return () => {
       disposed = true; cancelAnimationFrame(refreshFrame)
+      menuResize.disconnect()
       root.removeEventListener('click', anchors)
       window.removeEventListener('hashchange', hashChange)
       window.removeEventListener('wheel', markInteraction)
@@ -395,5 +197,3 @@ export default function useSalonScroll() {
     }
   }, [])
 }
-
-

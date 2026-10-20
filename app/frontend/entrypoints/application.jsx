@@ -2,11 +2,12 @@ import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AnimatePresence, motion, MotionConfig, useReducedMotion } from 'framer-motion'
 import CinematicHero from '../components/CinematicHero'
-import { CraftSection, SectionLabel, StudioSection, TransformationGallery } from '../components/EditorialSections'
+import { SectionLabel, StudioSection, TransformationGallery } from '../components/EditorialSections'
 import GsapCardGallery from '../components/GsapCardGallery'
 import { days, reviews, salon, services } from '../data/salonContent'
 import './salon.css'
 import useSalonScroll from '../animations/useSalonScroll'
+import useSalonInteractions from '../animations/useSalonInteractions'
 import '../animations/salonScroll.css'
 
 function Arrow() { return <span aria-hidden="true">↗</span> }
@@ -17,6 +18,7 @@ function Brand() {
 
 function App() {
   useSalonScroll()
+  useSalonInteractions()
   const [menu, setMenu] = useState(false)
   const [category, setCategory] = useState('All')
   const [review, setReview] = useState(0)
@@ -41,18 +43,15 @@ function App() {
       <header className="header">
         <Brand />
         <nav id="navigation" className={`navigation${menu ? ' is-open' : ''}`} aria-label="Main navigation">
-          {[['The craft', 'craft'], ['Our studio', 'studio'], ['The work', 'transformations'], ['Services', 'services']].map(([label, id]) => <a key={id} href={`#${id}`} onClick={() => setMenu(false)}>{label}</a>)}
+          {[['Services', 'services'], ['Style inspiration', 'transformations'], ['The salon', 'studio'], ['Reviews', 'reviews']].map(([label, id]) => <a key={id} href={`#${id}`} onClick={() => setMenu(false)}>{label}</a>)}
         </nav>
-        <a className="nav-visit" href="#visit">Visit the studio <Arrow /></a>
+        <a className="nav-visit" href="#visit">Find us <Arrow /></a>
         <button ref={menuButton} className="menu-button" aria-controls="navigation" aria-expanded={menu} onClick={() => setMenu(!menu)}>{menu ? 'Close −' : 'Menu +'}</button>
       </header>
       <CinematicHero />
     </div>
 
     <main id="main">
-      <CraftSection />
-      <StudioSection />
-      <TransformationGallery />
 
       <GsapCardGallery
         allServices={services}
@@ -62,13 +61,15 @@ function App() {
         phone={salon.phone}
       />
 
+      <TransformationGallery />
+      <StudioSection />
       <section className="reviews-section section" id="reviews" aria-labelledby="reviews-heading">
         <div className="section-heading">
           <div>
-            <SectionLabel number="06">Word from the chair</SectionLabel>
-            <h2 id="reviews-heading">A good experience.<br /><em>Worth sharing.</em></h2>
+            <SectionLabel number="04">Word from the chair</SectionLabel>
+            <h2 id="reviews-heading">Good words.<br /><em>From the chair.</em></h2>
           </div>
-          <p>Highlights from the verified Google listing.<br />Explore authentic customer feedback or add your own.</p>
+          <p>Explore feedback from the supplied Google listing.<br />Read more, or share your own experience.</p>
         </div>
 
         <div className="reviews-layout">
@@ -128,12 +129,12 @@ function App() {
                         exit={{ opacity: 0, x: reduced ? 0 : -12 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <blockquote>"{current.text}"</blockquote>
+                        <blockquote>{current.text}</blockquote>
                         <figcaption>
                           <span className="reviewer-initials">{current.initials}</span>
                           <div>
                             <strong>{current.name}</strong>
-                            <span>Verified Google review · {current.date || 'Recent'}</span>
+                            <span>Review summary · Reference listing</span>
                           </div>
                         </figcaption>
                       </motion.figure>
@@ -180,14 +181,13 @@ function App() {
       </section>
 
       <section className="visit-section section" id="visit" aria-labelledby="visit-heading">
-        <div className="visit-copy"><p className="eyebrow">RIGHT HERE IN SIVAKASI</p><h2 id="visit-heading">Find your<br /><em>way here.</em></h2><address><strong>Satchiyapuram, Sivakasi</strong><span>1st floor, 66/581B, Sivakasi Industrial Complex,<br />Arumugam Colony, next to Jamuna Devi Hospital,<br />Tamil Nadu 626123.</span></address><a className="text-link" href={salon.mapsUrl} target="_blank" rel="noreferrer">Get directions <Arrow /></a><p className="source-note">Address and contact details from the supplied {salon.source} listing.</p></div>
+        <div className="visit-copy"><p className="eyebrow">RIGHT HERE IN SIVAKASI</p><h2 id="visit-heading">Your next stop.<br /><em>ABC Salon.</em></h2><address><strong>Satchiyapuram, Sivakasi</strong><span>1st floor, 66/581B, Sivakasi Industrial Complex,<br />Arumugam Colony, next to Jamuna Devi Hospital,<br />Tamil Nadu 626123.</span></address><a className="visit-phone" href={salon.phoneUrl}>Call {salon.phone} ↗</a><a className="text-link" href={salon.mapsUrl} target="_blank" rel="noreferrer">Get directions <Arrow /></a><p className="source-note">Address and contact details from the supplied {salon.source} listing.</p></div>
         <div className="hours"><div className="hours-title"><h3>Opening hours</h3><span>IST</span></div><dl>{days.map(day => <div key={day}><dt>{day}</dt><dd>9:00 AM – 8:00 PM</dd></div>)}</dl><p className="hours-footnote">Google-listed hours · Checked {salon.checkedAt}.<br />Holiday hours may differ. Please call before visiting.</p></div>
       </section>
     </main>
 
-    <footer className="footer"><div className="footer-top"><Brand /><p>THE ART OF THE FADE.<br /><span>HAIRSTYLING & MAKEUP / SIVAKASI</span></p><nav aria-label="Footer navigation"><a href="#reviews">Reviews</a><a href="#visit">Visit us</a><a href="#top">Back to top ↑</a></nav></div><div className="footer-bottom"><span>© {new Date().getFullYear()} ABC Salon · Preview brand & concept imagery</span><a href={salon.listingUrl} target="_blank" rel="noreferrer">Business details: {salon.source} on Google ↗</a></div></footer>
+    <footer className="footer"><div className="footer-top"><Brand /><p>FRESH CUTS. GOOD ENERGY.<br /><span>HAIRSTYLING & MAKEUP / SIVAKASI</span></p><nav aria-label="Footer navigation"><a href="#reviews">Reviews</a><a href="#visit">Visit us</a><a href="#top">Back to top ↑</a></nav></div><div className="footer-bottom"><span>© {new Date().getFullYear()} ABC Salon · Preview brand & concept imagery</span><a href={salon.listingUrl} target="_blank" rel="noreferrer">Business details: {salon.source} on Google ↗</a></div></footer>
   </MotionConfig>
 }
 
 createRoot(document.getElementById('root')).render(<App />)
-

@@ -7,12 +7,12 @@ export function heroScrollPose(progress, compact = false) {
   const eased=p*p*(3-2*p)
   return {
     progress:p,
-    dolly:1-eased*(compact?.055:.24),
-    orbit:eased*(compact?.10:.50),
-    lift:eased*(compact?.04:.20),
-    turn:eased*(compact?.28:.90),
-    tilt:eased*(compact?.04:.12),
-    separation:eased*(compact?.06:.52),
+    dolly:1-eased*(compact?.12:.24),
+    orbit:eased*(compact?.18:.50),
+    lift:eased*(compact?.08:.20),
+    turn:eased*(compact?.62:.90),
+    tilt:eased*(compact?.08:.12),
+    separation:eased*(compact?.15:.52),
   }
 }
 export function scissorsPose(seconds, reduced = false) {
@@ -54,7 +54,7 @@ export function heroComposition(seconds, width, height, slot = null) {
   const drift=1.025+Math.sin(seconds*.08)*.012
   distance*=drift
   const viewHeight=2*tan*distance, viewWidth=viewHeight*aspect
-  const anchor=portrait?(width<370?.85:.80):.70
+  const anchor=portrait?.43:.70
   const centerY=portrait?(slot?(slot.top+slot.bottom)/(2*height):.69):.51
   const anchorX=(anchor-.5)*viewWidth
   // Allow a small overlap at the handle while keeping the long diagonal tips in frame.
@@ -62,7 +62,7 @@ export function heroComposition(seconds, width, height, slot = null) {
   return {
     camera:{x:Math.sin(seconds*.09)*.04,y:Math.sin(seconds*.07)*.02,z:distance},
     clipper:{x:anchorX,y:(.5-centerY)*viewHeight,z:.10},
-    scissors:{x:anchorX+(portrait?(width<370?.30:.50):tablet?.65:desktopSeparation),y:(.5-centerY)*viewHeight+(portrait?-1.15:.30),z:-.65,scale:portrait?.70:tablet?.82:1,angleOffset:portrait?.28:0},
+    scissors:{x:anchorX+(portrait?1.1:tablet?.65:desktopSeparation),y:(.5-centerY)*viewHeight+(portrait?.18:.30),z:-.65,scale:portrait?.70:tablet?.82:1,angleOffset:portrait?.28:0},
     floorY:portrait?( .5-centerY)*viewHeight-2.40:-2.08,
   }
 }
