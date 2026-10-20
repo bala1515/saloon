@@ -34,9 +34,13 @@ FROM base AS build
 # Vite 8 requires a modern Node runtime during asset compilation.
 COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
-RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
+# npm's npx executable is also required by vite_ruby's build runner.
+RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
+    ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx && \
+    node --version && npm --version && npx --version
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+RUN npm ci --include=dev --no-audit --no-fund && \
+    npx --no-install vite --version
 
 # Install packages needed to build gems
 RUN apt-get update -qq && \
