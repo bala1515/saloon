@@ -70,3 +70,11 @@ Official references:
 - Entrypoint Bash syntax, non-server pass-through and missing-environment failure path checked.
 - Rails `RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bin/rails assets:precompile` passed, including Vite. Existing JavaScript chunk-size warning remains. Local libvips warning was emitted; the Dockerfile installs libvips.
 - Docker is not installed in this WSL environment, so the final Docker image was not built locally. Aiven networking, CA validity, database creation privileges and Render deployment remain unverified until your service credentials/certificate are configured.
+
+## net-pop lockfile repair
+
+Ruby 3.3.3 shipped a bundled net-pop 0.1.2 gemspec with missing dependency metadata (https://bugs.ruby-lang.org/issues/20581). This project's lockfile was missing `net-protocol` beneath `net-pop (0.1.2)`. That dependency edge has been restored without changing gem versions. A generic `bundle update net-pop` on the affected Ruby install can reproduce the omission, so do not regenerate the lockfile blindly.
+
+Verified with a fresh isolated Linux production bundle (Ruby 3.3.3 / Bundler 2.5.11): 97 gems installed successfully with BUNDLE_DEPLOYMENT=true, BUNDLE_FROZEN=true and development/test excluded. `bundle check`, Bootsnap gem precompile and production asset precompile passed; Vite reused its current compiled assets. The corrected lockfile stayed byte-for-byte unchanged. This is not a complete Docker-image or live Aiven connection test.
+
+Commit/push Gemfile.lock before redeploying. The newly repaired config/credentials.yml.enc also needs to be pushed together with setting its matching, new RAILS_MASTER_KEY in Render. Never commit config/master.key. A cached dependency layer is automatically invalidated when the copied lockfile changes.
